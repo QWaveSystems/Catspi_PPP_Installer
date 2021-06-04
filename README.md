@@ -6,9 +6,9 @@ Repository of Catspi PPP Installer Tool
 All source files are downloded from internet in this method. It is enough to download **ppp_install_standalone.sh** and run it.
 
 ```
-wget https://raw.githubusercontent.com/QWaveSystems/Catspi_PPP_Installer/master/ppp_install_standalone.sh
-sudo chmod +x ppp_install_standalone.sh
-sudo ./ppp_install_standalone.sh
+wget https://raw.githubusercontent.com/QWaveSystems/Catspi_PPP_Installer/master/ppp_catspi_install.sh
+sudo chmod +x ppp_catspi_install.sh
+sudo ./ppp_catspi_install.sh
 ```
 
 ## After running installation script
