@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/bin/bash ppp_connection_manager.sh
-WorkingDirectory=/opt/sixfab/ppp_connection_manager
+WorkingDirectory=/opt/qwave/ppp_connection_manager
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
