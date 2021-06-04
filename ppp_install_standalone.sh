@@ -2,10 +2,10 @@
 
 # Re-created on November 27, 2020 by Yasin Kaya (selengalp) 
 
-SIXFAB_PATH="/opt/sixfab"
-PPP_PATH="/opt/sixfab/ppp_connection_manager"
+QWAVE_PATH="/opt/qwave"
+PPP_PATH="/opt/qwave/ppp_connection_manager"
 
-REPO_PATH="https://raw.githubusercontent.com/sixfab/Sixfab_PPP_Installer"
+REPO_PATH="https://raw.githubusercontent.com/QWaveSystems/Catspi_PPP_Installer"
 BRANCH=master
 SOURCE_PATH="$REPO_PATH/$BRANCH/src"
 SCRIPT_PATH="$REPO_PATH/$BRANCH/src/reconnect_scripts"
@@ -41,12 +41,12 @@ function colored_echo
 }
 
 
-# Check Sixfab path 
-if [[ -e $SIXFAB_PATH ]]; then
-    colored_echo "Sixfab path already exist!" ${SET}
+# Check Qwave path 
+if [[ -e $QWAVE_PATH ]]; then
+    colored_echo "Qwave path already exist!" ${SET}
 else
-    sudo mkdir $SIXFAB_PATH
-    colored_echo "Sixfab path is created." ${SET}
+    sudo mkdir $QWAVE_PATH
+    colored_echo "Qwave path is created." ${SET}
 fi
 
 # Check PPP path 
@@ -56,27 +56,6 @@ else
     sudo mkdir $PPP_PATH
     colored_echo "PPP path is created." ${SET}
 fi
-
-
-colored_echo "Please choose your Sixfab Shield/HAT:"
-colored_echo "1: GSM/GPRS Shield"
-colored_echo "2: 3G, 4G/LTE Base Shield"
-colored_echo "3: Cellular IoT App Shield"
-colored_echo "4: Cellular IoT HAT"
-colored_echo "5: Tracker HAT"
-colored_echo "6: 3G/4G Base HAT"
-
-
-read shield_hat
-case $shield_hat in
-    1)    colored_echo "You chose GSM/GPRS Shield" ${GREEN};;
-    2)    colored_echo "You chose Base Shield" ${GREEN};;
-    3)    colored_echo "You chose CellularIoT Shield" ${GREEN};;
-    4)    colored_echo "You chose CellularIoT HAT" ${GREEN};;
-	5)    colored_echo "You chose Tracker HAT" ${GREEN};;
-	6)    colored_echo "You chose 3G/4G Base HAT" ${GREEN};;		
-    *)    colored_echo "Wrong Selection, exiting" ${RED}; exit 1;
-esac
 
 colored_echo "Checking requirements..."
 
@@ -214,10 +193,8 @@ if ! (grep -q 'sudo route' /etc/ppp/ip-up ); then
     echo "sudo route add default ppp0" >> /etc/ppp/ip-up	
 fi
 
-if [[ $shield_hat -eq 2 ]] || [[ $shield_hat -eq 6 ]]; then
-	if ! (grep -q 'max_usb_current' /boot/config.txt ); then
-		echo "max_usb_current=1" >> /boot/config.txt
-	fi
+if ! (grep -q 'max_usb_current' /boot/config.txt ); then
+    echo "max_usb_current=1" >> /boot/config.txt
 fi
 
 while [ 1 ]
@@ -247,59 +224,11 @@ do
 
 			# APN Configuration
 			sed -i "s/SIM_APN/$carrierapn/" configure_modem.sh
-
-			if [ $shield_hat -eq 1 ]; then
-			  
-				wget --no-check-certificate  $SCRIPT_PATH/reconnect_gprsshield -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
-
-				sed -i "s/STATUS_PIN/$STATUS_GPRS/" configure_modem.sh
-				sed -i "s/POWERKEY_PIN/$POWERKEY_GPRS/" configure_modem.sh
-				sed -i "s/POWERUP_FLAG/$POWERUP_REQ/" configure_modem.sh
-
-			  
-			elif [ $shield_hat -eq 2 ]; then 
-			  
-				wget --no-check-certificate   $SCRIPT_PATH/reconnect_baseshield -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
-
-				sed -i "s/POWERUP_FLAG/$POWERUP_NOT_REQ/" configure_modem.sh
-				
-			elif [ $shield_hat -eq 3 ]; then 
-			  
-				wget --no-check-certificate   $SCRIPT_PATH/reconnect_cellulariot_app -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
-
-				sed -i "s/STATUS_PIN/$STATUS_CELL_IOT_APP/" configure_modem.sh
-				sed -i "s/POWERKEY_PIN/$POWERKEY_CELL_IOT_APP/" configure_modem.sh
-				sed -i "s/POWERUP_FLAG/$POWERUP_REQ/" configure_modem.sh
-			  
-			elif [ $shield_hat -eq 4 ]; then 
-			  
-				wget --no-check-certificate   $SCRIPT_PATH/reconnect_cellulariot -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
-
-				sed -i "s/STATUS_PIN/$STATUS_CELL_IOT/" configure_modem.sh
-				sed -i "s/POWERKEY_PIN/$POWERKEY_CELL_IOT/" configure_modem.sh
-				sed -i "s/POWERUP_FLAG/$POWERUP_REQ/" configure_modem.sh
 			
-			elif [ $shield_hat -eq 5 ]; then 
-			  
-				wget --no-check-certificate   $SCRIPT_PATH/reconnect_tracker -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
+			wget --no-check-certificate   $SCRIPT_PATH/reconnect_basehat -O $RECONNECT_SCRIPT_NAME
+			if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
 
-				sed -i "s/STATUS_PIN/$STATUS_TRACKER/" configure_modem.sh
-				sed -i "s/POWERKEY_PIN/$POWERKEY_TRACKER/" configure_modem.sh
-				sed -i "s/POWERUP_FLAG/$POWERUP_REQ/" configure_modem.sh
-
-			elif [ $shield_hat -eq 6 ]; then 
-			  
-				wget --no-check-certificate   $SCRIPT_PATH/reconnect_basehat -O $RECONNECT_SCRIPT_NAME
-				if [[ $? -ne 0 ]]; then colored_echo "Download failed" ${RED}; exit 1; fi
-
-				sed -i "s/POWERUP_FLAG/$POWERUP_NOT_REQ/" configure_modem.sh
-
-			fi
+			sed -i "s/POWERUP_FLAG/$POWERUP_NOT_REQ/" configure_modem.sh
 			  
 			  mv functions.sh $PPP_PATH
 			  mv configs.sh $PPP_PATH
