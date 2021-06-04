@@ -12,10 +12,6 @@ sudo ./ppp_catspi_install.sh
 ```
 
 ## After running installation script
-It will ask several questions, just answer them accordingly to complete the installation process. The questions are:
-`Please choose your Sixfab Shield/HAT`
- 
-You will be offered to choose among the mentioned four shields/HAT. Then it will fetch required scripts for you. 
 
 Then it installs ppp. 
 
